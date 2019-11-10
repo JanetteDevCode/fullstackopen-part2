@@ -23,7 +23,6 @@ const Content = ({ parts }) => {
       );
     });
   };
-
   return (
     <div>
       {rows()}
@@ -31,19 +30,30 @@ const Content = ({ parts }) => {
   );
 };
 
-// const Total = (props) => {
-//   return (
-//     <p>
-//       Number of exercises {props.parts[0].exercises + props.parts[1].exercises + props.parts[2].exercises}
-//     </p>
-//   );
-// };
+const Total = ({ exercises }) => {
+  const sumOfExercises = () => {
+    return exercises.reduce((accumulator, currentValue) => {
+      return accumulator + currentValue
+    });
+  };
+  return (
+    <h2>
+      total of {sumOfExercises()} exercises
+    </h2>
+  );
+};
 
 const Course = ({ course }) => {
+  const exercises = () => {
+    return course.parts.map((part) => {
+      return part.exercises
+    });
+  };
   return (
     <div>
       <Header name={course.name} />
       <Content parts={course.parts} />
+      <Total exercises={exercises()} />
     </div>
   );
 };
@@ -69,7 +79,6 @@ const App = () => {
       }
     ]
   };
-
   return (
     <div>
       <Course course={course} />
