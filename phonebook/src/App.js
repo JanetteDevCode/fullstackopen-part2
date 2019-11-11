@@ -1,18 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import PersonForm from './components/PersonForm';
 import Persons from './components/Persons';
 import Filter from './components/Filter';
 
 const App = () => {
-  const [persons, setPersons] = useState([
-    { name: 'Arto Hellas', phone: '040-123456' },
-    { name: 'Ada Lovelace', phone: '39-44-5323523' },
-    { name: 'Dan Abramov', phone: '12-43-234345' },
-    { name: 'Mary Poppendieck', phone: '39-23-6423122' }
-  ]);
+  const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState('');
   const [newPhone, setNewPhone] = useState('');
   const [filter, setNewFilter] = useState('');
+
+  const hook = () => {
+    axios
+      .get('http://localhost:3001/persons')
+      .then((response) => {
+        console.log('response.data', response.data);
+        setPersons(response.data);
+      });
+  };
+
+  useEffect(hook, []);
 
   const personExists = (name) => {
     return persons.find((person) => {
@@ -39,7 +46,7 @@ const App = () => {
     }
     const person = {
       name: name,
-      phone: phone
+      number: phone
     };
     setPersons(persons.concat(person));
     setNewName('');
