@@ -3,16 +3,29 @@ import Person from './components/Person';
 
 const App = () => {
   const [persons, setPersons] = useState([
-    {name: 'Arto Hellas', phone: '040-123456'}
+    { name: 'Arto Hellas', phone: '040-123456' },
+    { name: 'Ada Lovelace', phone: '39-44-5323523' },
+    { name: 'Dan Abramov', phone: '12-43-234345' },
+    { name: 'Mary Poppendieck', phone: '39-23-6423122' }
   ]);
   const [newName, setNewName] = useState('');
   const [newPhone, setNewPhone] = useState('');
+  const [filter, setNewFilter] = useState('');
 
   const showPersons = () => {
-    return persons.map((person, index) => {
+    const searchTerm = filter.trim();
+    const personsToShow = searchTerm ? filterPersons(searchTerm) : persons;
+    return personsToShow.map((person, index) => {
       return (
         <Person key={index + 1} person={person} />
       );
+    });
+  };
+
+  // case-insensitive filter
+  const filterPersons = (term) => {
+    return persons.filter((person) => {
+      return person.name.toLowerCase().includes(term.toLowerCase());
     });
   };
 
@@ -48,23 +61,31 @@ const App = () => {
     setNewPhone('');
   };
 
-  const changeNewName = (event) => {
+  const changeName = (event) => {
     setNewName(event.target.value);
   };
 
-  const changeNewPhone = (event) => {
+  const changePhone = (event) => {
     setNewPhone(event.target.value);
+  };
+
+  const changeFilter = (event) => {
+    setNewFilter(event.target.value);
   };
 
   return (
     <div>
         <h2>Phonebook</h2>
+        <div>
+          filter shown with <input value={filter} onChange={changeFilter} />
+        </div>
+        <h3>add new contact</h3>
         <form onSubmit={addPerson}>
           <div>
-            name: <input placeholder='Jane Doe' value={newName} onChange={changeNewName} />
+            name: <input placeholder='Jane Doe' value={newName} onChange={changeName} />
           </div>
           <div>
-            number: <input placeholder='555-867-5309' value={newPhone} onChange={changeNewPhone} />
+            number: <input placeholder='555-867-5309' value={newPhone} onChange={changePhone} />
           </div>
           <div>
             <button type="submit">add</button>
