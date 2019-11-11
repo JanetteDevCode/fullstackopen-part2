@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import Person from './components/Person';
+import PersonForm from './components/PersonForm';
+import Persons from './components/Persons';
+import Filter from './components/Filter';
 
 const App = () => {
   const [persons, setPersons] = useState([
@@ -11,23 +13,6 @@ const App = () => {
   const [newName, setNewName] = useState('');
   const [newPhone, setNewPhone] = useState('');
   const [filter, setNewFilter] = useState('');
-
-  const showPersons = () => {
-    const searchTerm = filter.trim();
-    const personsToShow = searchTerm ? filterPersons(searchTerm) : persons;
-    return personsToShow.map((person, index) => {
-      return (
-        <Person key={index + 1} person={person} />
-      );
-    });
-  };
-
-  // case-insensitive filter
-  const filterPersons = (term) => {
-    return persons.filter((person) => {
-      return person.name.toLowerCase().includes(term.toLowerCase());
-    });
-  };
 
   const personExists = (name) => {
     return persons.find((person) => {
@@ -76,23 +61,16 @@ const App = () => {
   return (
     <div>
         <h2>Phonebook</h2>
-        <div>
-          filter shown with <input value={filter} onChange={changeFilter} />
-        </div>
+        <Filter filter={filter} changeFilter={changeFilter} />
         <h3>add new contact</h3>
-        <form onSubmit={addPerson}>
-          <div>
-            name: <input placeholder='Jane Doe' value={newName} onChange={changeName} />
-          </div>
-          <div>
-            number: <input placeholder='555-867-5309' value={newPhone} onChange={changePhone} />
-          </div>
-          <div>
-            <button type="submit">add</button>
-          </div>
-        </form>
+        <PersonForm
+          addPerson={addPerson}
+          newName={newName}
+          changeName={changeName}
+          newPhone={newPhone}
+          changePhone={changePhone} />
         <h2>Numbers</h2>
-        <div>{showPersons()}</div>
+        <Persons filter={filter} persons={persons} />
     </div>
   );
 };
