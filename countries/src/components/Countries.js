@@ -6,8 +6,7 @@ const Countries = ({ countries, selectedCountry, setSelectedCountry }) => {
     return countries.map((country) => {
       return (
         <p key={country.name}>
-          {country.name}
-          <button onClick={setCountryToShow(country)}>show</button>
+          {country.name} <button onClick={setCountryToShow(country)}>show</button>
         </p>
       );
     });
