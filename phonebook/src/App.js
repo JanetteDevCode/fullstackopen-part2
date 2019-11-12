@@ -10,16 +10,13 @@ const App = () => {
   const [newPhone, setNewPhone] = useState('');
   const [filter, setNewFilter] = useState('');
 
-  const hook = () => {
+  useEffect(() => {
     axios
       .get('http://localhost:3001/persons')
       .then((response) => {
-        console.log('response.data', response.data);
         setPersons(response.data);
       });
-  };
-
-  useEffect(hook, []);
+  }, []);
 
   const personExists = (name) => {
     return persons.find((person) => {
@@ -44,13 +41,17 @@ const App = () => {
       setNewName('');
       return;
     }
-    const person = {
+    const newPerson = {
       name: name,
       number: phone
     };
-    setPersons(persons.concat(person));
-    setNewName('');
-    setNewPhone('');
+    axios
+      .post('http://localhost:3001/persons', newPerson)
+      .then((response) => {
+        setPersons(persons.concat(response.data));
+        setNewName('');
+        setNewPhone('');
+      });
   };
 
   const changeName = (event) => {
