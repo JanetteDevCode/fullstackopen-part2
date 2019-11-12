@@ -19,6 +19,21 @@
       "name": "Mary Poppendieck",
       "number": "39-23-6423122",
       "id": 4
+    },
+    {
+      "name": "Cora Day",
+      "number": "555-4545",
+      "id": 7
+    },
+    {
+      "name": "Arlo Dee",
+      "number": "144-7886",
+      "id": 8
+    },
+    {
+      "name": "Dana Fine",
+      "number": "114-7878",
+      "id": 9
     }
   ]
 }

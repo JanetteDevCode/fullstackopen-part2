@@ -26,10 +26,22 @@ const createPerson = (newPerson) => {
   );
 };
 
-const deletePerson = (deletePersonID) => {
+const updatePerson = (editedPerson) => {
   return (
     axios
-      .delete(`${baseUrl}/${deletePersonID}`)
+      .put(`${baseUrl}/${editedPerson.id}`, editedPerson)
+      .then((response) => {
+        console.log('update person successful');
+        console.log('response data', response.data);
+        return response.data;
+      })
+  );
+}
+
+const deletePerson = (removablePerson) => {
+  return (
+    axios
+      .delete(`${baseUrl}/${removablePerson.id}`)
       .then((response) => {
         console.log('delete person successful');
         console.log('response data', response.data);
@@ -41,5 +53,6 @@ const deletePerson = (deletePersonID) => {
 export default {
   getAll,
   createPerson,
+  updatePerson,
   deletePerson
 };

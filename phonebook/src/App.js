@@ -11,46 +11,67 @@ const App = () => {
   const [filter, setNewFilter] = useState('');
 
   useEffect(() => {
-    personService
-      .getAll()
-      .then((initialPersons) => {
-        setPersons(initialPersons);
-      });
+    getAllPersons();
   }, []);
 
   const personExists = (name) => {
     return persons.find((person) => {
-      return person.name === name;
+      return person.name.toLowerCase() === name.toLowerCase();
     });
+  };
+
+  const getAllPersons = () => {
+    personService
+      .getAll()
+      .then((persons) => {
+        setPersons(persons);
+      })
+      .catch((error) => {
+        console.log('get all persons error:', error);
+        alert(`Could not get persons from the server.`);
+      });
   };
 
   const addPerson = (personToAdd) => {
     personService
       .createPerson(personToAdd)
       .then((returnedPerson) => {
-        alert(`${returnedPerson.name} was successfully added to the server.`)
         setPersons(persons.concat(returnedPerson));
-        setNewName('');
-        setNewPhone('');
+        alert(`${returnedPerson.name} was successfully added to the server.`);
+      })
+      .catch((error) => {
+        console.log('add person error:', error);
+        alert(`${personToAdd.name} could not be added.`);
       });
   }
+  
+  const updatePerson = (personToUpdate) => {
+    personService
+      .updatePerson(personToUpdate)
+      .then((returnedPerson) => {
+        setPersons(persons.map((person) => {
+          return personToUpdate.id !== person.id ? person : returnedPerson;
+        }));
+        alert(`${returnedPerson.name} was successfully updated on the server.`)
+      })
+      .catch((error) => {
+        console.log('update person error:', error);
+        alert(`${personToUpdate.name} could not be updated.`);
+      });
+  };
 
   const deletePerson = (personToDelete) => {
     personService
-      .deletePerson(personToDelete.id)
+      .deletePerson(personToDelete)
       .then((returnedPerson) => {
-        console.log('returned person after delete person:', returnedPerson);
-        alert(`${personToDelete.name} was successfully deleted from the server.`)
-        // sync persons in browser with server
-        personService
-          .getAll()
-          .then((updatedPersons) => {
-            setPersons(updatedPersons);
-        });
+        setPersons(persons.filter((person) => {
+          return personToDelete.id !== person.id;
+        }));
+        alert(`${personToDelete.name} was successfully deleted from the server.`);
       })
       .catch((error) => {
         console.log('delete person error:', error);
-        alert('person could not be deleted');
+        alert(`${personToDelete.name} could not be deleted.`);
       });
   };
 
@@ -58,32 +79,49 @@ const App = () => {
     event.preventDefault();
     const name = newName.trim();
     const phone = newPhone.trim();
+    const existingPerson = personExists(name);
     if (!name) {
-      alert('No name is given');
+      alert('No name was given.');
       return;
     }
     if (!phone) {
-      alert('No phone number is given');
+      alert('No phone number was given.');
       return;
     }
-    if (personExists(name)) {
-      alert(`${name} is already added to phonebook`);
+    if (existingPerson && phone === existingPerson.number) {
+      alert(`${name} is already in the phonebook.`);
       setNewName('');
       return;
+    } else if (existingPerson) {
+      const confirmUpdate = window.confirm(`${existingPerson.name} already exists. Replace phone number?`);
+      if (confirmUpdate) {
+        const editedPerson = {
+          ...existingPerson,
+          number: phone
+        };
+        updatePerson(editedPerson);
+      } else {
+        alert('No update was made.');
+      }
+    } else {
+      const newPerson = {
+        name: name,
+        number: phone
+      };
+      addPerson(newPerson);
     }
-    const person = {
-      name: name,
-      number: phone
-    };
-    addPerson(person);
+    setNewName('');
+    setNewPhone('');
   };
 
   const handleDeletePerson = (person) => {
     return (() => {
-      console.log('handle delete person', person);
       const confirmDelete = window.confirm(`Delete ${person.name}?`);
       if (confirmDelete) {
-        deletePerson(person);
+        const removablePerson = {
+          ...person
+        };
+        deletePerson(removablePerson);
       } else {
         alert('No person was deleted.');
       }
