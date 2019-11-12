@@ -12,7 +12,7 @@ const Persons = ({ filter, persons }) => {
   const showPersons = () => {
     const searchTerm = filter.trim();
     const personsToShow = searchTerm ? filterPersons(searchTerm) : persons;
-    return personsToShow.map((person, index) => {
+    return personsToShow.map((person) => {
       return (
         <Person key={person.name} person={person} />
       );
