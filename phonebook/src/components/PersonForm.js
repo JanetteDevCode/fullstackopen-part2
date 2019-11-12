@@ -2,7 +2,7 @@ import React from 'react';
 
 const PersonForm = (props) => {
   return (
-    <form onSubmit={props.addPerson}>
+    <form onSubmit={props.handleAddPerson}>
       <div>
         name: <input placeholder='Jane Doe' value={props.newName} onChange={props.changeName} />
       </div>

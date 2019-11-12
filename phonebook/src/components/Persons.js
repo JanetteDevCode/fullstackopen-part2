@@ -1,7 +1,7 @@
 import React from 'react';
 import Person from './Person';
 
-const Persons = ({ filter, persons }) => {
+const Persons = ({ filter, persons, handleDeletePerson }) => {
   // case-insensitive filter
   const filterPersons = (term) => {
     return persons.filter((person) => {
@@ -14,7 +14,10 @@ const Persons = ({ filter, persons }) => {
     const personsToShow = searchTerm ? filterPersons(searchTerm) : persons;
     return personsToShow.map((person) => {
       return (
-        <Person key={person.name} person={person} />
+        <Person 
+          key={person.name} 
+          person={person} 
+          handleDeletePerson={handleDeletePerson} />
       );
     });
   };

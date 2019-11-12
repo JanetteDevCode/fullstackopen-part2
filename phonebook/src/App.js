@@ -24,7 +24,37 @@ const App = () => {
     });
   };
 
-  const addPerson = (event) => {
+  const addPerson = (personToAdd) => {
+    personService
+      .createPerson(personToAdd)
+      .then((returnedPerson) => {
+        alert(`${returnedPerson.name} was successfully added to the server.`)
+        setPersons(persons.concat(returnedPerson));
+        setNewName('');
+        setNewPhone('');
+      });
+  }
+
+  const deletePerson = (personToDelete) => {
+    personService
+      .deletePerson(personToDelete.id)
+      .then((returnedPerson) => {
+        console.log('returned person after delete person:', returnedPerson);
+        alert(`${personToDelete.name} was successfully deleted from the server.`)
+        // sync persons in browser with server
+        personService
+          .getAll()
+          .then((updatedPersons) => {
+            setPersons(updatedPersons);
+        });
+      })
+      .catch((error) => {
+        console.log('delete person error:', error);
+        alert('person could not be deleted');
+      });
+  };
+
+  const handleAddPerson = (event) => {
     event.preventDefault();
     const name = newName.trim();
     const phone = newPhone.trim();
@@ -41,17 +71,23 @@ const App = () => {
       setNewName('');
       return;
     }
-    const newPerson = {
+    const person = {
       name: name,
       number: phone
     };
-    personService
-      .create(newPerson)
-      .then((returnedPerson) => {
-        setPersons(persons.concat(returnedPerson));
-        setNewName('');
-        setNewPhone('');
-      });
+    addPerson(person);
+  };
+
+  const handleDeletePerson = (person) => {
+    return (() => {
+      console.log('handle delete person', person);
+      const confirmDelete = window.confirm(`Delete ${person.name}?`);
+      if (confirmDelete) {
+        deletePerson(person);
+      } else {
+        alert('No person was deleted.');
+      }
+    });
   };
 
   const changeName = (event) => {
@@ -72,13 +108,16 @@ const App = () => {
         <Filter filter={filter} changeFilter={changeFilter} />
         <h3>add new contact</h3>
         <PersonForm
-          addPerson={addPerson}
+          handleAddPerson={handleAddPerson}
           newName={newName}
           changeName={changeName}
           newPhone={newPhone}
           changePhone={changePhone} />
         <h2>Numbers</h2>
-        <Persons filter={filter} persons={persons} />
+        <Persons 
+          filter={filter} 
+          persons={persons} 
+          handleDeletePerson={handleDeletePerson} />
     </div>
   );
 };

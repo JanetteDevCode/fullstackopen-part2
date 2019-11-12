@@ -14,7 +14,7 @@ const getAll = () => {
   );
 };
 
-const create = (newPerson) => {
+const createPerson = (newPerson) => {
   return (
     axios
       .post(baseUrl, newPerson)
@@ -26,7 +26,20 @@ const create = (newPerson) => {
   );
 };
 
+const deletePerson = (deletePersonID) => {
+  return (
+    axios
+      .delete(`${baseUrl}/${deletePersonID}`)
+      .then((response) => {
+        console.log('delete person successful');
+        console.log('response data', response.data);
+        return response.data;
+      })
+  );
+};
+
 export default {
   getAll,
-  create
+  createPerson,
+  deletePerson
 };
