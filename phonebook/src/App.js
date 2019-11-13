@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import PersonForm from './components/PersonForm';
 import Persons from './components/Persons';
 import Filter from './components/Filter';
+import Notification, { NotificationType } from './components/Notification';
 import personService from './services/persons';
 
 const App = () => {
@@ -9,10 +10,25 @@ const App = () => {
   const [newName, setNewName] = useState('');
   const [newPhone, setNewPhone] = useState('');
   const [filter, setNewFilter] = useState('');
+  const [notification, setNotification] = useState(null);
+  const [timer, setTimer] = useState(null);
 
   useEffect(() => {
     getAllPersons();
   }, []);
+
+  const displayNotification = (type, message) => {
+    setNotification({
+      type: type,
+      message: message
+    });
+    clearTimeout(timer);
+    setTimer(
+      setTimeout(() => {
+        setNotification(null);
+      }, 5000)
+    );
+  };
 
   const personExists = (name) => {
     return persons.find((person) => {
@@ -37,7 +53,10 @@ const App = () => {
       .createPerson(personToAdd)
       .then((returnedPerson) => {
         setPersons(persons.concat(returnedPerson));
-        alert(`${returnedPerson.name} was successfully added to the server.`);
+        displayNotification(
+          NotificationType.SUCCESS, 
+          `${returnedPerson.name} was successfully added to the server.`
+        );
       })
       .catch((error) => {
         console.log('add person error:', error);
@@ -52,7 +71,10 @@ const App = () => {
         setPersons(persons.map((person) => {
           return personToUpdate.id !== person.id ? person : returnedPerson;
         }));
-        alert(`${returnedPerson.name} was successfully updated on the server.`)
+        displayNotification(
+          NotificationType.SUCCESS,
+          `${returnedPerson.name} was successfully updated on the server.`
+        );
       })
       .catch((error) => {
         console.log('update person error:', error);
@@ -67,7 +89,10 @@ const App = () => {
         setPersons(persons.filter((person) => {
           return personToDelete.id !== person.id;
         }));
-        alert(`${personToDelete.name} was successfully deleted from the server.`);
+        displayNotification(
+          NotificationType.SUCCESS,
+          `${personToDelete.name} was successfully deleted from the server.`
+        );
       })
       .catch((error) => {
         console.log('delete person error:', error);
@@ -81,15 +106,24 @@ const App = () => {
     const phone = newPhone.trim();
     const existingPerson = personExists(name);
     if (!name) {
-      alert('No name was given.');
+      displayNotification(
+        NotificationType.ERROR,
+        'No name was given.'
+      );
       return;
     }
     if (!phone) {
-      alert('No phone number was given.');
+      displayNotification(
+        NotificationType.ERROR,
+        'No phone number was given.'
+      );
       return;
     }
     if (existingPerson && phone === existingPerson.number) {
-      alert(`${name} is already in the phonebook.`);
+      displayNotification(
+        NotificationType.ERROR,
+        `${name} is already in the phonebook.`
+      );
       setNewName('');
       return;
     } else if (existingPerson) {
@@ -101,7 +135,10 @@ const App = () => {
         };
         updatePerson(editedPerson);
       } else {
-        alert('No update was made.');
+        displayNotification(
+          NotificationType.INFO,
+          'No update was made.'
+        );
       }
     } else {
       const newPerson = {
@@ -123,7 +160,10 @@ const App = () => {
         };
         deletePerson(removablePerson);
       } else {
-        alert('No person was deleted.');
+        displayNotification(
+          NotificationType.INFO,
+          'No person was deleted.'
+        );
       }
     });
   };
@@ -139,10 +179,11 @@ const App = () => {
   const changeFilter = (event) => {
     setNewFilter(event.target.value);
   };
-
+  
   return (
     <div>
         <h2>Phonebook</h2>
+        <Notification notification={notification} />
         <Filter filter={filter} changeFilter={changeFilter} />
         <h3>add new contact</h3>
         <PersonForm
