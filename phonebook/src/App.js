@@ -15,6 +15,7 @@ const App = () => {
 
   useEffect(() => {
     getAllPersons();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const displayNotification = (type, message) => {
@@ -30,12 +31,6 @@ const App = () => {
     );
   };
 
-  const personExists = (name) => {
-    return persons.find((person) => {
-      return person.name.toLowerCase() === name.toLowerCase();
-    });
-  };
-
   const getAllPersons = () => {
     personService
       .getAll()
@@ -44,8 +39,17 @@ const App = () => {
       })
       .catch((error) => {
         console.log('get all persons error:', error);
-        alert(`Could not get persons from the server.`);
+        displayNotification(
+          NotificationType.ERROR,
+          'Could not get persons from the server.'
+        );
       });
+  };
+
+  const personExists = (name) => {
+    return persons.find((person) => {
+      return person.name.toLowerCase() === name.toLowerCase();
+    });
   };
 
   const addPerson = (personToAdd) => {
@@ -60,7 +64,10 @@ const App = () => {
       })
       .catch((error) => {
         console.log('add person error:', error);
-        alert(`${personToAdd.name} could not be added.`);
+        displayNotification(
+          NotificationType.ERROR,
+          `${personToAdd.name} could not be added to the server.`
+        )
       });
   }
   
@@ -78,7 +85,13 @@ const App = () => {
       })
       .catch((error) => {
         console.log('update person error:', error);
-        alert(`${personToUpdate.name} could not be updated.`);
+        setPersons(persons.filter((person) => {
+          return personToUpdate.id !== person.id;
+        }));
+        displayNotification(
+          NotificationType.ERROR,
+          `${personToUpdate.name} could not be updated since the person does not exist on the server.`
+        );
       });
   };
 
@@ -96,7 +109,13 @@ const App = () => {
       })
       .catch((error) => {
         console.log('delete person error:', error);
-        alert(`${personToDelete.name} could not be deleted.`);
+        setPersons(persons.filter((person) => {
+          return personToDelete.id !== person.id;
+        }));
+        displayNotification(
+          NotificationType.ERROR,
+          `${personToDelete.name} was already deleted from the server.`
+        );
       });
   };
 
